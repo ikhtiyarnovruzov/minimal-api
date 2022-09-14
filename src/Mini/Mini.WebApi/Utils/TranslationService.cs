@@ -66,4 +66,28 @@ public sealed class TranslationService
             return string.Empty;
         });
     }
+
+    public async Task<string> RandomAsync(string source, int capacity)
+    {
+        return await Task.Run(() =>
+        {
+            var theSource = _sources.FirstOrDefault(x => x.Code.Equals(source, StringComparison.OrdinalIgnoreCase));
+
+            if (theSource == null)
+            {
+                return string.Empty;
+            }
+
+            var result = new List<string>();
+            var random = new Random();
+
+            for (int i = 0; i < capacity; i++)
+            {
+                var index = random.Next(0, 1000);
+                result.Add(theSource.Keys[index].Key);
+            }
+
+            return string.Join(" ", result);
+        });
+    }
 }
