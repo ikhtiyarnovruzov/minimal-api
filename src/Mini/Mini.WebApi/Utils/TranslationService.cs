@@ -20,18 +20,24 @@ public sealed class TranslationService
     {
         try
         {
-            var files = Directory.GetFiles(Environment.CurrentDirectory);
+            var files = Directory.GetFiles(Path.Combine(Environment.CurrentDirectory, "Sources"));
             if (files?.Length > 0)
             {
+                var sourceModels = new List<SourceModel>();
                 foreach (var file in files)
                 {
                     if (Regex.IsMatch(Path.GetFileName(file), _pattern))
                     {
                         var sourcesString = await File.ReadAllTextAsync(file);
-                        var sourceModels = JsonConvert.DeserializeObject<SourceModel[]>(sourcesString);
-                        return sourceModels ?? Array.Empty<SourceModel>();
+                        var sourceModel = JsonConvert.DeserializeObject<SourceModel>(sourcesString);
+
+                        if (sourceModel != null)
+                        {
+                            sourceModels.Add(sourceModel);
+                        }
                     }
                 }
+                return sourceModels.ToArray();
             }
         }
         catch { }
@@ -43,7 +49,21 @@ public sealed class TranslationService
     {
         return await Task.Run(() =>
         {
-            return "Translated " + key;
+            var fromSource = _sources.FirstOrDefault(x => x.Code.Equals(from, StringComparison.OrdinalIgnoreCase));
+            var toSource = _sources.FirstOrDefault(x => x.Code.Equals(to, StringComparison.OrdinalIgnoreCase));
+
+            if (fromSource != null && toSource != null)
+            {
+                for (int i = 0; i < fromSource.Keys.Length; i++)
+                {
+                    if (fromSource.Keys[i].Key == key)
+                    {
+                        return toSource.Keys[i].Key;
+                    }
+                }
+            }
+
+            return string.Empty;
         });
     }
 }
