@@ -1,12 +1,28 @@
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
 using Mini.WebApi.Utils;
+
+using static System.Net.Mime.MediaTypeNames;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton<TranslationService>();
 
 var app = builder.Build();
+
+app.UseExceptionHandler(handler =>
+{
+    handler.Run(async context =>
+    {
+        context.Response.ContentType = Text.Plain;
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+
+        var handlerFeature = context.Features.Get<IExceptionHandlerPathFeature>();
+
+        await context.Response.WriteAsync(handlerFeature.Error.Message);
+    });
+});
 
 app.MapGet("/", () => Results.Ok("Mini"));
 
