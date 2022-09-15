@@ -56,11 +56,64 @@ public sealed class TranslationService
             {
                 for (int i = 0; i < fromSource.Keys.Length; i++)
                 {
-                    if (fromSource.Keys[i].Key == key)
+                    if (fromSource.Keys[i].Key.Equals(key, StringComparison.OrdinalIgnoreCase))
                     {
                         return toSource.Keys[i].Key;
                     }
                 }
+            }
+
+            return string.Empty;
+        });
+    }
+
+    public async Task<string> TranslateTextAsync(string from, string to, string text)
+    {
+        if (string.IsNullOrEmpty(from))
+        {
+            throw new ArgumentNullException(nameof(from));
+        }
+
+        if (string.IsNullOrEmpty(to))
+        {
+            throw new ArgumentNullException(nameof(from));
+        }
+
+        if (string.IsNullOrEmpty(text))
+        {
+            throw new ArgumentNullException(nameof(from));
+        }
+
+        if (text.Length > 250)
+        {
+            throw new ArgumentOutOfRangeException(nameof(from));
+        }
+
+        return await Task.Run(() =>
+        {
+            var fromSource = _sources.FirstOrDefault(x => x.Code.Equals(from, StringComparison.OrdinalIgnoreCase));
+            var toSource = _sources.FirstOrDefault(x => x.Code.Equals(to, StringComparison.OrdinalIgnoreCase));
+
+            if (fromSource != null && toSource != null)
+            {
+                var keys = text.Split(new char[] { ' ', '_' }).ToArray();
+                var translatedKeys = new List<string>();
+
+                for (int k = 0; k < keys.Length; k++)
+                {
+                    var key = keys[k];
+
+                    for (int i = 0; i < fromSource.Keys.Length; i++)
+                    {
+                        if (fromSource.Keys[i].Key.Equals(key, StringComparison.OrdinalIgnoreCase))
+                        {
+                            translatedKeys.Add(toSource.Keys[i].Key);
+                            break;
+                        }
+                    }
+                }
+
+                return string.Join(" ", translatedKeys);
             }
 
             return string.Empty;
