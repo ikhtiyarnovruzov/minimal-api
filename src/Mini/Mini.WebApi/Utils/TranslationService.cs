@@ -13,10 +13,10 @@ public sealed class TranslationService
 
     public TranslationService()
     {
-        _sources = GetSources().GetAwaiter().GetResult();
+        _sources = GetFileSources().GetAwaiter().GetResult();
     }
 
-    private async Task<SourceModel[]> GetSources()
+    private async Task<SourceModel[]> GetFileSources()
     {
         try
         {
@@ -43,6 +43,11 @@ public sealed class TranslationService
         catch { }
 
         return Array.Empty<SourceModel>();
+    }
+
+    public string[] GetSources()
+    {
+        return _sources.Select(x => x.Code).ToArray();
     }
 
     public async Task<string> TranslateAsync(string from, string to, string key)

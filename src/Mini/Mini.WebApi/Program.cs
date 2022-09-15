@@ -26,6 +26,10 @@ app.UseExceptionHandler(handler =>
 
 app.MapGet("/", () => Results.Ok("Mini"));
 
+app.MapGet("/sources", (TranslationService facade) => facade.GetSources() is string[] sources
+        ? Results.Ok(sources)
+        : Results.NotFound());
+
 app.MapGet("/translate/{from}/{to}/{key}", async (string from, string to, string key, TranslationService facade) =>
     await facade.TranslateAsync(from, to, key) is string translatedKey
         ? Results.Ok(translatedKey)
