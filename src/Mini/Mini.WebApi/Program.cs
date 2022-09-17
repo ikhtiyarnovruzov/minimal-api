@@ -42,7 +42,7 @@ app.MapGet("/translate/{from}/{to}/{key}", async (string from, string to, string
         ? Results.Ok(translatedKey)
         : Results.StatusCode(StatusCodes.Status500InternalServerError));
 
-app.MapGet("/random/{source:int}/{capacity}", async (string source, int? capacity, TranslationService facade) =>
+app.MapGet("/random/{source}/{capacity}", async (string source, int? capacity, TranslationService facade) =>
     await facade.RandomAsync(source, capacity ?? 10) is string translatedKey
         ? Results.Ok(translatedKey)
         : Results.StatusCode(StatusCodes.Status500InternalServerError));
