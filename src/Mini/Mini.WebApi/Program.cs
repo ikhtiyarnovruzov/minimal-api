@@ -1,10 +1,8 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
-using Mini.WebApi.Models;
+using Mini.WebApi.Middlewares;
 using Mini.WebApi.Utils;
-
-using Newtonsoft.Json;
 
 using static System.Net.Mime.MediaTypeNames;
 
@@ -31,42 +29,7 @@ app.UseExceptionHandler(handler =>
 
 app.UseSession();
 
-app.Use(async (context, next) =>
-{
-    var ipAddress = context.Connection.RemoteIpAddress.ToString();
-
-    if (context.Session.GetString(ipAddress) == null)
-    {
-        SessionModel sessionModel = new()
-        {
-            IPAddress = ipAddress,
-            LastAccessDate = DateTime.UtcNow,
-        };
-        context.Session.SetString(ipAddress, JsonConvert.SerializeObject(sessionModel));
-    }
-    else
-    {
-        var sessionModel = JsonConvert.DeserializeObject<SessionModel>(context.Session.GetString(ipAddress));
-        var waiting = DateTime.UtcNow - sessionModel.LastAccessDate;
-
-        if (waiting < new TimeSpan(0, 0, 5))
-        {
-            context.Response.StatusCode = StatusCodes.Status403Forbidden;
-            var diff = 5 - waiting.Seconds;
-            var message = $"Wait for {(diff <= 1 ? "1 second" : $"{diff} seconds")}";
-            await context.Response.WriteAsync(message);
-            return;
-        }
-        else
-        {
-            sessionModel.LastAccessDate = DateTime.UtcNow;
-            context.Session.Remove(ipAddress);
-            context.Session.SetString(ipAddress, JsonConvert.SerializeObject(sessionModel));
-        }
-    }
-
-    await next.Invoke();
-});
+app.UseMiddleware<LimitedSessionMiddleware>();
 
 app.MapGet("/", () => Results.Ok("Mini"));
 
