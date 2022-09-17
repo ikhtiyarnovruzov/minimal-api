@@ -29,7 +29,7 @@ app.UseExceptionHandler(handler =>
 
 app.UseSession();
 
-app.UseMiddleware<LimitedSessionMiddleware>();
+app.UseLimitedSessionMiddleware();
 
 app.MapGet("/", () => Results.Ok("Mini"));
 

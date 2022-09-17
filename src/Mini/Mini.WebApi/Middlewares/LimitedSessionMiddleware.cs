@@ -50,4 +50,11 @@ namespace Mini.WebApi.Middlewares
             await _next.Invoke(context);
         }
     }
+    public static class LimitedSessionMiddlewareExtensions
+    {
+        public static IApplicationBuilder UseLimitedSessionMiddleware(this IApplicationBuilder builder)
+        {
+            return builder.UseMiddleware<LimitedSessionMiddleware>();
+        }
+    }
 }
