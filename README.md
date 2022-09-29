@@ -8,6 +8,10 @@ There is a bunch of endpoints which allow user to interact with the translation 
 Try it out [here](https://minimal-api.azurewebsites.net)  
 OpenAPI WIP
 
+- Get available set of languages - [Languages](https://minimal-api.azurewebsites.net/sources)
+- Translate "world" from English to Azerbaijani (+POST variant) - [Translate](https://minimal-api.azurewebsites.net/translate/en/az/world)
+- Generate something for fun - [Random](https://minimal-api.azurewebsites.net/random/az/10)
+
 # References
 - [Minimal APIs overview](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis?view=aspnetcore-6.0)
 - [Tutorial: Create a minimal web API with ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/tutorials/min-web-api?view=aspnetcore-6.0&tabs=visual-studio)
